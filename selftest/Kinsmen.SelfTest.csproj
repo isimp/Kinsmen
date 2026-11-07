@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../Kinsmen.csproj" Private="false" />
+    <!-- Only the self-test: it saves the effect icon as a picture (ImageConversion.EncodeToPNG). -->
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedDir)/UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 
   <Target Name="DeployToProfile" AfterTargets="Build"

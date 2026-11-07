@@ -54,6 +54,8 @@ $sources = @(
     (Join-Path $managed "assembly_guiutils.dll"),
     (Join-Path $managed "UnityEngine.dll"),
     (Join-Path $managed "UnityEngine.CoreModule.dll"),
+    # The self-test saves the effect icon as a picture (ImageConversion.EncodeToPNG).
+    (Join-Path $managed "UnityEngine.ImageConversionModule.dll"),
     # ServerSync rewrites the connect-error screen (TextMeshPro), and the skills window's level
     # text is TextMeshPro too.
     (Join-Path $managed "Unity.TextMeshPro.dll"),

@@ -54,6 +54,7 @@ namespace Kinsmen.SelfTest
                 if (held.Any(s => s.m_info.m_skill == Skills.SkillType.Run)) report.Guarded("run speed", () => RunSpeedFollows(report, player, runFull, runFactorFull));
                 report.Guarded("an effect on top", () => EffectOnTop(report, player, skills, held));
                 report.Guarded("the effect icon", () => Icon(report, player, held));
+                report.Guarded("the effect icon's picture", () => IconPicture(report, player));
                 report.Guarded("the skills window", () => Window(report, player, skills));
                 report.Guarded("the commands", () => Commands(report, held));
                 report.Guarded("rising", () => RisingIgnoresTheHold(report, held));
@@ -168,6 +169,35 @@ namespace Kinsmen.SelfTest
             }
             report.Check(icon != null && icon.Held == count && count >= 1, "the effect icon shows " + Words.HeldIcon(count), icon == null ? "not in the HUD's list" : "it says " + Report.Count(icon.Held));
             report.Check(!player.GetSEMan().GetStatusEffects().OfType<KinsmenIcon>().Any(), "the icon is not among the character's own effects, so it is never saved or sent", "the character carries it");
+        }
+
+        /// <summary>
+        /// The icon's picture: the game's Rested knot in bronze, made from the game's own icon. Its
+        /// pixels must be bronze and the knot whole; the picture is saved beside the log as
+        /// Kinsmen-icon.png, to be looked at.
+        /// </summary>
+        private static void IconPicture(Report report, Player player)
+        {
+            var icon = HeldEffect.IconFor(player);
+            var sprite = icon != null ? icon.m_icon : null;
+            report.Check(sprite != null && sprite.name == "Kinsmen knot", "the effect icon is the game's own Rested knot in bronze",
+                sprite == null ? "no icon" : "it is " + sprite.name + ", which stands in when the knot cannot be made (see the log)");
+            if (sprite == null || sprite.name != "Kinsmen knot") return;
+
+            var pixels = sprite.texture.GetPixels32();
+            var opaque = pixels.Where(p => p.a > 128).ToList();
+            var share = (float)opaque.Count / pixels.Length;
+            var red = opaque.Count > 0 ? opaque.Average(p => (float)p.r) : 0f;
+            var green = opaque.Count > 0 ? opaque.Average(p => (float)p.g) : 0f;
+            var blue = opaque.Count > 0 ? opaque.Average(p => (float)p.b) : 0f;
+            report.Note("knot " + Report.Count(sprite.texture.width) + " x " + Report.Count(sprite.texture.height) + ", " + Report.N(share * 100f) + "% covered, average " +
+                        Report.N(red) + " / " + Report.N(green) + " / " + Report.N(blue));
+            report.Check(share > 0.1f && share < 0.9f, "the knot came through whole, neither empty nor a filled square", Report.N(share * 100f) + "% of it is covered");
+            report.Check(red > green && green > blue && red > 120f, "the knot is bronze", "average " + Report.N(red) + " / " + Report.N(green) + " / " + Report.N(blue));
+
+            var path = System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "Kinsmen-icon.png");
+            System.IO.File.WriteAllBytes(path, ImageConversion.EncodeToPNG(sprite.texture));
+            report.Note("the icon is saved as " + path);
         }
 
         /// <summary>Builds the game's skills window for the character, reads every row, and leaves the window as it was.</summary>

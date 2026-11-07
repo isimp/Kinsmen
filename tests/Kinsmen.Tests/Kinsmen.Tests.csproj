@@ -23,6 +23,7 @@
     <Compile Include="../../src/SkillList.cs" />
     <Compile Include="../../src/CountingTable.cs" />
     <Compile Include="../../src/Words.cs" />
+    <Compile Include="../../src/Bronze.cs" />
   </ItemGroup>
 
   <ItemGroup>
