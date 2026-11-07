@@ -1,0 +1,7 @@
+{
+  "name": "Kinsmen",
+  "version_number": "0.1.0",
+  "website_url": "https://github.com/isimp/Kinsmen",
+  "description": "Holds a character far ahead of the group in fight skills near the rest on your server, without touching anyone's saved levels.",
+  "dependencies": []
+}

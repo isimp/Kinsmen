@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Tests for the parts of Kinsmen that need no game: the ladder rule, the server's record, the
+       skill list, what a game works out from the record and the words the player reads. They
+       compile against the metadata-only game assemblies in lib/, whose methods all throw: at run
+       time they touch only the game's skill enum from those. The files that need the running
+       game are left out, each named with why in tests/Kinsmen.Standards/GameOnlyFiles.cs.
+       They need no BepInEx.dll.
+       Run with: dotnet test tests/Kinsmen.Tests
+       Not referenced by Kinsmen.csproj, so the plugin build never builds it. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <RootNamespace>Kinsmen.Tests</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../src/Ladder.cs" />
+    <Compile Include="../../src/Record.cs" />
+    <Compile Include="../../src/SkillList.cs" />
+    <Compile Include="../../src/CountingTable.cs" />
+    <Compile Include="../../src/Words.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="assembly_valheim"><HintPath>$(MSBuildThisFileDirectory)../../lib/assembly_valheim.dll</HintPath></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(MSBuildThisFileDirectory)../../lib/UnityEngine.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(MSBuildThisFileDirectory)../../lib/UnityEngine.CoreModule.dll</HintPath></Reference>
+  </ItemGroup>
+
+</Project>

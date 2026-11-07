@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>Kinsmen</AssemblyName>
+    <RootNamespace>Kinsmen</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Version>0.1.0</Version>
+    <Authors>isimp</Authors>
+    <Product>Kinsmen</Product>
+    <Description>Holds a character far ahead of the group in fight skills near the rest, without touching saved levels.</Description>
+    <Copyright>Copyright (c) 2026 isimp</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <DebugType>portable</DebugType>
+    <!-- annotations, not enable: the vendored ServerSync source is written against nullable
+         reference types, and this lets its `?` annotations parse without turning null-state
+         warnings on for the rest of the project. -->
+    <Nullable>annotations</Nullable>
+    <NoWarn>$(NoWarn);CS0649</NoWarn>
+  </PropertyGroup>
+
+  <Import Project="BuildChecks.props" />
+  <Import Project="GameReferences.props" />
+
+  <!-- The unit tests and the in-game self-test are projects of their own. -->
+  <ItemGroup>
+    <Compile Remove="tests/**" />
+    <Compile Remove="selftest/**" />
+    <InternalsVisibleTo Include="Kinsmen.SelfTest" />
+  </ItemGroup>
+
+  <Target Name="DeployToProfile" AfterTargets="Build"
+          Condition="'$(LibsDir)' == '' And Exists('$(BepInExDir)\plugins')">
+    <MakeDir Directories="$(DeployDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DeployDir)" ContinueOnError="true" />
+    <Message Importance="high" Text="Kinsmen -> $(DeployDir)" />
+  </Target>
+
+</Project>

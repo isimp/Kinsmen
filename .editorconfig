@@ -1,0 +1,8 @@
+# blaxxun's ServerSync, compiled in unchanged (see src/ServerSync/README.md): not ours to restyle.
+# The analyzers treat it as generated code and leave it alone; the compiler's own checks, doc
+# comments included, still apply to it. As generated code its nullable annotations are read as
+# none, which changes nothing in what is compiled; the compiler's note that it does so (CS8669)
+# is turned off for it.
+[src/ServerSync/**.cs]
+generated_code = true
+dotnet_diagnostic.CS8669.severity = none

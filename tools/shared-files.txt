@@ -1,0 +1,22 @@
+# Files Kinsmen shares with Bindrune, the same in both but for the mod's name.
+# tools/check-shared.sh compares each with Bindrune's copy, and the pre-push hook runs it.
+# A file that differs by design is not listed: the failure standard, which names this mod's own way
+# of telling a failure; the language standard, whose summary gives no panel as Kinsmen has none; the
+# pre-push hook, as these unit tests need no BepInEx.dll; the publish script's store categories.
+# Columns are separated by a tab.
+names	Kinsmen	Bindrune
+tests/Kinsmen.Standards/CommentStandardTests.cs	tests/Bindrune.Standards/CommentStandardTests.cs
+tests/Kinsmen.Standards/FileAndDocStandardTests.cs	tests/Bindrune.Standards/FileAndDocStandardTests.cs
+tests/Kinsmen.Standards/StringStandardTests.cs	tests/Bindrune.Standards/StringStandardTests.cs
+tests/Kinsmen.Standards/UnitTestReachStandardTests.cs	tests/Bindrune.Standards/UnitTestReachStandardTests.cs
+tests/Kinsmen.Standards/UnityNullStandardTests.cs	tests/Bindrune.Standards/UnityNullStandardTests.cs
+tests/Kinsmen.Standards/VersionStandardTests.cs	tests/Bindrune.Standards/VersionStandardTests.cs
+tests/Kinsmen.Standards/Violations.cs	tests/Bindrune.Standards/Violations.cs
+tests/Kinsmen.Standards/ResetStandardTests.cs	tests/Bindrune.Standards/ResetStandardTests.cs
+tests/Kinsmen.Standards/SourceCompilesTests.cs	tests/Bindrune.Standards/SourceCompilesTests.cs
+src/UnityNull.cs	src/UnityNull.cs
+BuildChecks.props	BuildChecks.props
+global.json	global.json
+.gitattributes	.gitattributes
+.githooks/commit-msg	.githooks/commit-msg
+tools/check-shared.sh	tools/check-shared.sh
