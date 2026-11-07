@@ -8,19 +8,19 @@ fetched 2026-09-17. Licence: **MIT-0** — public-domain-equivalent, no attribut
 may simply be compiled in. It is the way most Valheim mods sync config: 32 of the mods in the
 profile this was built against embed the same file.
 
-It is vendored as source rather than referenced as a package on purpose. Compiled in, Hoard
+It is vendored as source rather than referenced as a package on purpose. Compiled in, Kinsmen
 stays a single DLL with nothing to install alongside it; as a dependency it would oblige everyone
 running the mod to fetch a library as well.
 
 **Keep it unmodified.** Updating should be a wholesale replacement of that one file. What it needs
-beyond itself lives in `Hoard.csproj`, `GameReferences.props` and `.editorconfig`, not in the file:
+beyond itself lives in `Kinsmen.csproj`, `GameReferences.props` and `.editorconfig`, not in the file:
 
 - `<Nullable>annotations</Nullable>`, so its `?` annotations parse without turning null-state
   warnings on for the rest of the project.
 - `System.IO.Compression`, which it uses to compress config payloads.
 - `Unity.TextMeshPro`, for the one place it rewrites the connect-error screen.
 - `generated_code = true` for `src/ServerSync/` in `.editorconfig`, so the code analysis rules
-  Hoard follows leave it alone; the standards tests compile it in without reading it.
+  Kinsmen follows leave it alone; the standards tests compile it in without reading it.
 
 It also wants JetBrains's `[PublicAPI]` and `[UsedImplicitly]`, and those need nothing: Unity ships
 both in `UnityEngine.CoreModule`. A hand-written stub for them compiles but collides with Unity's,

@@ -22,7 +22,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release -p:LibsDir=lib --nologo
 
-      # The unit tests build the seal rules on their own, with no game and no BepInEx.dll.
+      # The unit tests build the rule, the record and the words on their own, with no game and no BepInEx.dll.
       - name: Test
         run: dotnet test tests/Kinsmen.Tests --nologo
 
