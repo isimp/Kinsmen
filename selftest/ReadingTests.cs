@@ -259,9 +259,17 @@ namespace Kinsmen.SelfTest
             var caps = RecordClient.DescribeCaps();
             var described = RecordClient.DescribeHeld();
             report.Note("/kinsmen caps: " + caps.Replace("\n", " | "));
-            var missing = held.Select(s => RecordClient.Name(s.m_info.m_skill)).Where(name => caps.IndexOf(name + ": above ", StringComparison.Ordinal) < 0).ToList();
-            report.Check(missing.Count == 0, "/kinsmen caps lists every held skill's cap", "missing " + string.Join(", ", missing));
-            var unsaid = RecordClient.Held(Player.m_localPlayer).Select(h => RecordClient.Name(h.Skill)).Where(name => described.IndexOf(name + " counts as ", StringComparison.Ordinal) < 0).ToList();
+            // Each held skill's line as the command words it, from the table as it stands, so the
+            // check follows the wording rather than repeating it.
+            var settings = Plugin.Settings;
+            var missing = held
+                .Where(s => caps.IndexOf(Words.CapLine(RecordClient.Name(s.m_info.m_skill), RecordClient.Table.Cap((int)s.m_info.m_skill, s.m_level), settings.Gap, settings.Rate), StringComparison.Ordinal) < 0)
+                .Select(s => RecordClient.Name(s.m_info.m_skill)).ToList();
+            report.Check(missing.Count == 0, "/kinsmen caps lists every held skill's cap as it stands", "missing " + string.Join(", ", missing));
+            var unsaid = RecordClient.Held(Player.m_localPlayer)
+                .Where(h => described.IndexOf(Words.Tooltip(RecordClient.Name(h.Skill), RecordClient.Whole(h.Counted), h.Why.Holder,
+                    RecordClient.Whole(h.Why.HolderLevel), RecordClient.Whole(h.Why.Limit), settings.Rate), StringComparison.Ordinal) < 0)
+                .Select(h => RecordClient.Name(h.Skill)).ToList();
             report.Check(unsaid.Count == 0, "/kinsmen held says why each held skill counts lower", "missing " + string.Join(", ", unsaid));
         }
 
