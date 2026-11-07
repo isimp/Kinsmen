@@ -23,13 +23,17 @@ namespace Kinsmen
         private readonly Dictionary<int, float> _fixed = new Dictionary<int, float>();
         private readonly LadderSettings _settings;
 
+        /// <summary>The server exempts this character: nothing of it is lowered, while the caps still read as they stand.</summary>
+        private readonly bool _exempt;
+
         private CountingTable()
         {
         }
 
-        public CountingTable(Record record, long self, ISet<int> held, LadderSettings settings, IDictionary<int, float> fixedCaps = null)
+        public CountingTable(Record record, long self, ISet<int> held, LadderSettings settings, IDictionary<int, float> fixedCaps = null, bool exempt = false)
         {
             _settings = settings;
+            _exempt = exempt;
             if (fixedCaps != null)
             {
                 foreach (var cap in fixedCaps) _fixed[cap.Key] = cap.Value;
@@ -45,11 +49,15 @@ namespace Kinsmen
         }
 
         /// <summary>Whether any skill can be lowered at all.</summary>
-        public bool Holds => _steps.Count > 0 || _fixed.Count > 0;
+        public bool Holds => !_exempt && (_steps.Count > 0 || _fixed.Count > 0);
+
+        /// <summary>Whether the server exempts this character.</summary>
+        public bool Exempt => _exempt;
 
         /// <summary>What a level of a skill counts as; never more than the level.</summary>
         public float Lower(int skill, float level)
         {
+            if (_exempt) return level;
             if (_fixed.TryGetValue(skill, out var cap)) return Ladder.Lower(level, cap, _settings.Rate);
             var best = BestBelowGap(skill, level);
             return best == null ? level : Ladder.Lower(level, best.Level + _settings.Gap, _settings.Rate);
@@ -58,6 +66,7 @@ namespace Kinsmen
         /// <summary>The ceiling a level stands under where it is lowered, none where it counts in full. A cap set by hand names no holder.</summary>
         public Ceiling Why(int skill, float level)
         {
+            if (_exempt) return null;
             if (_fixed.TryGetValue(skill, out var cap)) return level > cap ? new Ceiling(cap, null, 0f) : null;
             var best = BestBelowGap(skill, level);
             if (best == null) return null;

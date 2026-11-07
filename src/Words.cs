@@ -42,6 +42,9 @@ namespace Kinsmen
                 : "The best " + skill + " of the group is " + Count(holderLevel) + ", by " + holder) +
             ": up to " + Count(limit) + " counts in full, each level above that " + Rate(rate) + ".";
 
+        /// <summary>What /kinsmen held says to a character the server exempts.</summary>
+        public const string Exempt = "Kinsmen: this server exempts you, so every skill of yours counts in full.";
+
         /// <summary>What plain /kinsmen says: every word that can follow it, the self-test's where it is installed; a word it does not know is named first.</summary>
         public static string Help(bool selfTest, string unknown)
         {

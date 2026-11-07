@@ -39,6 +39,7 @@ namespace Kinsmen.SelfTest
             RecordClient.UseRecord(Holds.Below(listed));
             try
             {
+                if (RecordClient.Table.Exempt) report.Note("this server exempts this character (Exempt), so none of its skills is held; every check below then expects them in full");
                 var held = trained.Where(s => RecordClient.Table.Why((int)s.m_info.m_skill, s.m_level) != null).ToList();
                 if (held.Count == 0)
                 {

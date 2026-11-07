@@ -26,7 +26,7 @@ Kinsmen has to be installed on the server and by every player, and the server re
 
 ## Settings
 
-All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the share each further level counts, the held skills, limits set by hand for single skills, and how long the record keeps a character.
+All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the share each further level counts, the held skills, limits set by hand for single skills, characters exempt from any limit, and how long the record keeps a character. An exempt character always counts in full, while its real levels still go into the record and still count for everyone else.
 
 ## More
 

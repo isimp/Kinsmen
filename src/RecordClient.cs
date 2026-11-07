@@ -91,7 +91,8 @@ namespace Kinsmen
                 var caps = SkillList.ParseCaps(Plugin.FixedCaps, unreadable);
                 if (unreadable.Count > 0) Plugin.Log.LogWarning("Kinsmen cannot read these caps set by hand and leaves them out: " + string.Join(", ", unreadable));
                 _tableFor = player.GetPlayerID();
-                _table = new CountingTable(record, _tableFor, _held, Plugin.Settings, caps);
+                var exempt = Exemptions.Parse(Plugin.ExemptNames).Covers(_tableFor, player.GetPlayerName());
+                _table = new CountingTable(record, _tableFor, _held, Plugin.Settings, caps, exempt);
             }
             HeldEffect.Refresh();
         }
@@ -148,6 +149,7 @@ namespace Kinsmen
         {
             if (_record == null) return "Kinsmen: no record from the server yet, so every skill counts in full.";
             if (!Plugin.Enabled) return "Kinsmen is turned off on this server: every skill counts in full.";
+            if (_table.Exempt) return Words.Exempt;
             var held = Held(Player.m_localPlayer);
             if (held.Count == 0) return "Kinsmen: none of your skills count lower here.";
             var text = new StringBuilder();

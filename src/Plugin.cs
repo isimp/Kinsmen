@@ -52,6 +52,7 @@ namespace Kinsmen
         private static ConfigEntry<float> _rate;
         private static ConfigEntry<int> _forgetAfterDays;
         private static ConfigEntry<string> _fixedCaps;
+        private static ConfigEntry<string> _exempt;
         private static ConfigEntry<bool> _showEffectIcon;
         private static ConfigEntry<bool> _showJoinMessage;
 
@@ -61,6 +62,7 @@ namespace Kinsmen
         internal static string SkillNames => _skills?.Value ?? SkillList.Default;
         internal static int ForgetAfterDays => _forgetAfterDays?.Value ?? 30;
         internal static string FixedCaps => _fixedCaps?.Value ?? "";
+        internal static string ExemptNames => _exempt?.Value ?? "";
         internal static bool ShowEffectIcon => _showEffectIcon == null || _showEffectIcon.Value;
         internal static bool ShowJoinMessage => _showJoinMessage == null || _showJoinMessage.Value;
 
@@ -118,6 +120,10 @@ namespace Kinsmen
                 "\"Swords=50, ElementalMagic=30\", with skill names as in Skills. Anyone above such a cap counts in full up to it and " +
                 "RateAbove beyond, whatever the group's levels; it holds a skill missing from Skills too. An entry Kinsmen cannot read " +
                 "is named in the log and left out. Empty by default."));
+
+            _exempt = Rule("Rule", "Exempt", "", new ConfigDescription(
+                "Characters whose skills always count in full, by name (any case) or by id for two of the same name, separated by commas. " +
+                "Their real levels still go into the record and still count for everyone else's limits. Empty by default."));
 
             _forgetAfterDays = Rule("Record", "ForgetAfterDays", 30, new ConfigDescription(
                 "A character not seen on the server for this many days drops out of the record. 0 keeps everyone.",

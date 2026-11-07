@@ -66,6 +66,12 @@ namespace Kinsmen.SelfTest
             var type = target.m_info.m_skill;
             var saved = target.m_level;
             report.Note("following " + type + " at " + Report.N(saved));
+            if (RecordClient.Table.Exempt)
+            {
+                report.Skip("this server exempts this character (Exempt), so a second player cannot hold it; take it off the list to run this part");
+                kept.Unchanged(report, skills, "after the server test");
+                yield break;
+            }
 
             // Another player far below: the skill is held, through the server.
             yield return Send(type, 0f, report);

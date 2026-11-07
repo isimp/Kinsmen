@@ -24,6 +24,7 @@
     <Compile Include="../../src/CountingTable.cs" />
     <Compile Include="../../src/Words.cs" />
     <Compile Include="../../src/Bronze.cs" />
+    <Compile Include="../../src/Exemptions.cs" />
   </ItemGroup>
 
   <ItemGroup>
