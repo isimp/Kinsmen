@@ -22,7 +22,7 @@ The effect icon (`src/HeldEffect.cs`) is added to the list the HUD asks `SEMan.G
 
 On the first record after joining, a held player gets a message in the middle of the screen and the list in chat. `/kinsmen`, `/kinsmen caps`, `/kinsmen record` and `/kinsmen forget Name` are chat commands; forget is done by the server for admins and the host only.
 
-Other mods that read the saved level themselves can ask `Kinsmen.KinsmenApi.TryCounted(skill, savedLevel, out counted, out why)` by reflection.
+Other mods that read the saved level themselves can ask `Kinsmen.KinsmenApi.TryCounted(skill, savedLevel, out counted, out why)` by reflection, or `TryHolder(skill, savedLevel, out counted, out holder, out holderLevel)` for the holder's name and level without a sentence to take apart (no name and the cap for a cap set by hand). Scry shows the counted level on its skill pages through `TryHolder`.
 
 ## Server rules
 
