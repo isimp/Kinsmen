@@ -42,6 +42,7 @@ namespace Kinsmen
                 rpc.Register<string>(Said, RecordClient.OnSaid);
                 RecordClient.Joined();
                 if (server) RecordServer.Start(ZNet.instance.GetWorldName());
+                else RecordServer.Stop();
             }
             catch (Exception e)
             {

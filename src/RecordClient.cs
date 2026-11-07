@@ -19,6 +19,9 @@ namespace Kinsmen
         private const float LookEvery = 2f;
 
         private static Record _record;
+
+        /// <summary>A record the self-test counts from instead of the server's while it is set; the server's keeps arriving underneath.</summary>
+        private static Record _madeUp;
         private static CountingTable _table = CountingTable.None;
         private static long _tableFor;
         private static string _sent;
@@ -33,6 +36,7 @@ namespace Kinsmen
         public static void Joined()
         {
             _record = null;
+            _madeUp = null;
             _table = CountingTable.None;
             _tableFor = 0;
             _sent = null;
@@ -41,14 +45,15 @@ namespace Kinsmen
             HeldEffect.Refresh();
         }
 
-        /// <summary>For the self-test: counts from this record instead of the server's until handed the old one back. Returns the one it replaced.</summary>
-        internal static Record UseRecord(Record record)
+        /// <summary>For the self-test: counts from this record instead of the server's, which keeps arriving underneath, until handed none.</summary>
+        internal static void UseRecord(Record madeUp)
         {
-            var before = _record;
-            _record = record;
+            _madeUp = madeUp;
             Rebuild();
-            return before;
         }
+
+        /// <summary>For the self-test: the record as the server last sent it, none before.</summary>
+        internal static Record ServerRecord => _record;
 
         /// <summary>The server sent the record.</summary>
         public static void OnRecord(long sender, string text)
@@ -74,7 +79,8 @@ namespace Kinsmen
             var unknown = new List<string>();
             _held = SkillList.Parse(Plugin.SkillNames, unknown);
             if (unknown.Count > 0) Plugin.Log.LogWarning("Kinsmen does not know these skills of its list and leaves them free: " + string.Join(", ", unknown));
-            if (_record == null || player == null || !Plugin.Enabled)
+            var record = _madeUp ?? _record;
+            if (record == null || player == null || !Plugin.Enabled)
             {
                 _table = CountingTable.None;
                 _tableFor = 0;
@@ -85,7 +91,7 @@ namespace Kinsmen
                 var caps = SkillList.ParseCaps(Plugin.FixedCaps, unreadable);
                 if (unreadable.Count > 0) Plugin.Log.LogWarning("Kinsmen cannot read these caps set by hand and leaves them out: " + string.Join(", ", unreadable));
                 _tableFor = player.GetPlayerID();
-                _table = new CountingTable(_record, _tableFor, _held, Plugin.Settings, caps);
+                _table = new CountingTable(record, _tableFor, _held, Plugin.Settings, caps);
             }
             HeldEffect.Refresh();
         }
@@ -116,7 +122,7 @@ namespace Kinsmen
             {
                 var player = Player.m_localPlayer;
                 if (player == null || ZRoutedRpc.instance == null || ZNet.instance == null) return;
-                if (_record != null && player.GetPlayerID() != _tableFor && Plugin.Enabled) Rebuild();
+                if ((_madeUp ?? _record) != null && player.GetPlayerID() != _tableFor && Plugin.Enabled) Rebuild();
                 SendIfChanged(player);
                 TellOnJoining(player);
             }

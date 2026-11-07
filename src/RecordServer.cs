@@ -22,6 +22,9 @@ namespace Kinsmen
         private static Record _record = new Record();
         private static string _path;
 
+        /// <summary>For the self-test: where this world's record is written, none where this game does not run the world.</summary>
+        internal static string RecordPath => _path;
+
         /// <summary>Opens the world's record. Called as the world starts.</summary>
         public static void Start(string worldName)
         {
@@ -29,6 +32,13 @@ namespace Kinsmen
             _record = Load(_path);
             if (_record.DropUnseen(Now(), Plugin.ForgetAfterDays) > 0) Save();
             Plugin.Log.LogInfo("Kinsmen record for this world: " + _path);
+        }
+
+        /// <summary>This game joined a world it does not run: nothing of an earlier world's record stays.</summary>
+        public static void Stop()
+        {
+            _path = null;
+            _record = new Record();
         }
 
         /// <summary>A game sent its character's real levels: note them and send the record to everyone.</summary>

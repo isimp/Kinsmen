@@ -90,9 +90,39 @@ namespace Kinsmen.Standards
                 var name = Name(method);
                 if (!Changing.Contains(name)) continue;
                 if (name == "Skills.Skill.Raise" && InSelfTest(call)) continue;
+                if (ThrowawayMay.Contains(name) && KinsmenSource.Relative(call.SyntaxTree) == ThrowawayFile) continue;
                 found.Add($"{KinsmenSource.Where(call)} {name}");
             }
             Violations.None("call a method that changes a character's skills", found);
+        }
+
+        /// <summary>The self-test's part that raises and lowers real skills, on a character made for it.</summary>
+        private const string ThrowawayFile = "selftest/Throwaway.cs";
+
+        /// <summary>The changing calls that part may make: the game's own ways a skill rises and a death lowers it.</summary>
+        private static readonly HashSet<string> ThrowawayMay = new HashSet<string> { "Player.RaiseSkill", "Skills.OnDeath" };
+
+        [Fact]
+        public void TheSelfTestChangesSkillsOnlyOnACharacterMadeForIt()
+        {
+            // The one entry into the changing part, Throwaway.Run, refuses first of all any character
+            // that is not one made for it; every other method there is private, so reached only from Run.
+            var found = new List<string>();
+            var tree = KinsmenSource.SelfTest.SyntaxTrees.FirstOrDefault(t => KinsmenSource.Relative(t) == ThrowawayFile);
+            Assert.NotNull(tree);
+            var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
+            var run = methods.FirstOrDefault(m => m.Identifier.Text == "Run");
+            var first = run?.Body?.Statements.FirstOrDefault() as IfStatementSyntax;
+            var guarded = first != null
+                && first.Condition is PrefixUnaryExpressionSyntax not && not.IsKind(SyntaxKind.LogicalNotExpression)
+                && not.Operand is InvocationExpressionSyntax check && check.Expression.ToString() == "IsThrowaway"
+                && first.Statement.DescendantNodesAndSelf().OfType<YieldStatementSyntax>().Any(y => y.IsKind(SyntaxKind.YieldBreakStatement));
+            if (!guarded) found.Add(ThrowawayFile + " Run does not begin by refusing a character that is not made for it");
+            foreach (var method in methods.Where(m => m != run && m.Identifier.Text != "IsThrowaway"))
+            {
+                if (!method.Modifiers.Any(SyntaxKind.PrivateKeyword)) found.Add($"{KinsmenSource.Where(method)} {method.Identifier.Text} is reachable from outside Run");
+            }
+            Violations.None("let the self-test change skills without the character check", found);
         }
 
         [Fact]
