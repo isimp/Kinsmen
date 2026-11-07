@@ -40,6 +40,25 @@ namespace Kinsmen.Tests
         }
 
         [Fact]
+        public void BothSettingsReadASkillNameWithOrWithoutItsSpaces()
+        {
+            var magic = (int)Skills.SkillType.ElementalMagic;
+            Assert.Equal(new HashSet<int> { magic }, SkillList.Parse("ElementalMagic", new List<string>()));
+            Assert.Equal(new HashSet<int> { magic }, SkillList.Parse("Elemental Magic", new List<string>()));
+            Assert.Equal(40f, SkillList.ParseCaps("ElementalMagic=40", new List<string>())[magic]);
+            Assert.Equal(40f, SkillList.ParseCaps("Elemental Magic=40", new List<string>())[magic]);
+        }
+
+        [Fact]
+        public void TheNamesTheSkillsWindowShowsAreNotTheGamesOwnAndAreTold()
+        {
+            // The window says Fists and Riding; the game's own names are Unarmed and Ride.
+            var unknown = new List<string>();
+            Assert.Empty(SkillList.Parse("Fists, Riding", unknown));
+            Assert.Equal(new List<string> { "Fists", "Riding" }, unknown);
+        }
+
+        [Fact]
         public void AnUnknownNameIsToldAndTheOthersStillCount()
         {
             var unknown = new List<string>();

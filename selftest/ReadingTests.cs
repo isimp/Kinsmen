@@ -179,6 +179,10 @@ namespace Kinsmen.SelfTest
                 report.Skip("the game's skills window is not there");
                 return;
             }
+            // The window lives inside the inventory, which has to be open for it to set itself up
+            // (Setup ends by starting a coroutine on it), so it is opened here as the player opens it.
+            var inventoryWasOpen = InventoryGui.IsVisible();
+            if (!inventoryWasOpen) InventoryGui.instance.Show(null);
             var wasOpen = dialog.gameObject.activeSelf;
             dialog.Setup(player);
             try
@@ -215,6 +219,7 @@ namespace Kinsmen.SelfTest
             finally
             {
                 if (!wasOpen) dialog.gameObject.SetActive(false);
+                if (!inventoryWasOpen) InventoryGui.instance.Hide();
             }
         }
 

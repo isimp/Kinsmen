@@ -99,7 +99,9 @@ namespace Kinsmen
                 "Whether held skills count lower. Off, every skill counts in full and the record is still kept."));
 
             _skills = Rule("Rule", "Skills", SkillList.Default, new ConfigDescription(
-                "The skills that can be held, by the game's names, separated by commas. A number stands for a skill another mod adds, by its id."));
+                "The skills that can be held, separated by commas, by the game's own names as in the default value, such as ElementalMagic, " +
+                "Unarmed and Ride (not the window's Fists and Riding); case and spaces do not matter. A number stands for a skill another " +
+                "mod adds, by its id. A name Kinsmen does not know is named in the log and left free."));
 
             _gap = Rule("Rule", "OutlierGap", 20f, new ConfigDescription(
                 "Walking up everyone's levels in a skill, the first step up wider than this splits off the characters far ahead. " +
@@ -116,8 +118,9 @@ namespace Kinsmen
 
             _fixedCaps = Rule("Rule", "FixedCaps", "", new ConfigDescription(
                 "Caps set by hand, replacing the group's cap for their skill, as Skill=level separated by commas, such as " +
-                "\"Swords=50, Blood Magic=30\". Anyone above such a cap counts in full up to it and RateAbove beyond, " +
-                "whatever the group's levels; it holds a skill missing from Skills too. Empty by default."));
+                "\"Swords=50, ElementalMagic=30\", with skill names as in Skills. Anyone above such a cap counts in full up to it and " +
+                "RateAbove beyond, whatever the group's levels; it holds a skill missing from Skills too. An entry Kinsmen cannot read " +
+                "is named in the log and left out. Empty by default."));
 
             _forgetAfterDays = Rule("Record", "ForgetAfterDays", 30, new ConfigDescription(
                 "A character not seen on the server for this many days drops out of the record. 0 keeps everyone.",
