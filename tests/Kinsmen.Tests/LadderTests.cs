@@ -5,15 +5,13 @@ namespace Kinsmen.Tests
 {
     /// <summary>
     /// How far one skill of a character counts on a server. Walking up everyone's levels, the
-    /// first gap wider than the set gap splits off the outliers; each of them counts in full up to
-    /// the best level below the gap plus the margin, and each level above that by the rate.
-    /// Everyone below the gap counts in full. Gap 20, margin 5 and rate a quarter throughout, the
-    /// defaults.
+    /// first step up wider than the gap splits off the outliers; each of them counts in full up to
+    /// the best level below the gap plus the gap, and each level beyond that by the rate. Everyone
+    /// below the gap counts in full. Gap 15 and rate a quarter throughout, the defaults.
     /// </summary>
     public class LadderTests
     {
-        private const float Gap = 20f;
-        private const float Margin = 5f;
+        private const float Gap = 15f;
         private const float Rate = 0.25f;
 
         private static List<Standing> Others(params (string Name, float Level)[] others)
@@ -24,18 +22,52 @@ namespace Kinsmen.Tests
         }
 
         private static float Counted(float level, List<Standing> others) =>
-            Ladder.Lower(level, Ladder.CeilingFor(others, level, Gap, Margin), Rate);
+            Ladder.Lower(level, Ladder.CeilingFor(others, level, Gap), Rate);
 
         [Fact]
-        public void AFriendFarAheadCountsFiveAboveTheBestOfTheRestAndAQuarterBeyond()
+        public void AFriendFarAheadCountsFifteenAboveTheBestOfTheRestAndAQuarterBeyond()
         {
-            Assert.Equal(58.75f, Counted(100f, Others(("Ragna", 40f), ("Bjorn", 25f))));
+            Assert.Equal(66.25f, Counted(100f, Others(("Ragna", 40f), ("Bjorn", 25f))));
+        }
+
+        [Fact]
+        public void TrainingNeverLowersTheCountedLevel()
+        {
+            // One more level of training may add little, but never takes anything away: no cliff at the gap.
+            var groups = new[]
+            {
+                Others(("Bjorn", 25f)),
+                Others(("Ragna", 40f), ("Bjorn", 25f)),
+                Others(("Bjorn", 20f), ("Ragna", 40f), ("Mid", 70f)),
+                Others(("Ragna", 0f), ("Bjorn", 0f)),
+                Others(("Ragna", 40.9f), ("Twin", 100f)),
+            };
+            foreach (var group in groups)
+            {
+                var before = 0f;
+                for (var tenth = 0; tenth <= 1000; tenth++)
+                {
+                    var counted = Counted(tenth / 10f, group);
+                    Assert.True(counted >= before, $"at {tenth / 10f} counted {counted}, below {before} a tenth earlier");
+                    before = counted;
+                }
+            }
+        }
+
+        [Fact]
+        public void TheHoldStartsAQuarterOfALevelPastTheGapAndGrowsFromThere()
+        {
+            var bjorn = Others(("Bjorn", 25f));
+            Assert.Equal(40f, Counted(40f, bjorn));
+            Assert.Equal(40.25f, Counted(41f, bjorn));
+            Assert.Equal(41.5f, Counted(46f, bjorn));
         }
 
         [Fact]
         public void TheGroupsOwnSpreadIsNeverHeld()
         {
             Assert.Equal(40f, Counted(40f, Others(("Bjorn", 20f), ("Sven", 30f))));
+            Assert.Equal(40f, Counted(40f, Others(("Bjorn", 25f))));
         }
 
         [Fact]
@@ -46,34 +78,33 @@ namespace Kinsmen.Tests
         }
 
         [Fact]
-        public void AGapOfExactlyTheSetSizeHoldsNobodyAndOneLevelMoreDoes()
+        public void AGapOfExactlyTheSetSizeHoldsNobodyAndOneLevelMoreBarelyDoes()
         {
-            Assert.Equal(60f, Counted(60f, Others(("Ragna", 40f))));
-            Assert.Equal(49f, Counted(61f, Others(("Ragna", 40f))));
+            Assert.Equal(55f, Counted(55f, Others(("Ragna", 40f))));
+            Assert.Equal(55.25f, Counted(56f, Others(("Ragna", 40f))));
         }
 
         [Fact]
         public void TwoMaxedCharactersAreBothHeld()
         {
-            Assert.Equal(58.75f, Counted(100f, Others(("Twin", 100f), ("Ragna", 40f))));
-            Assert.Equal(58.75f, Counted(100f, Others(("Twin", 95f), ("Ragna", 40f))));
-            Assert.Equal(57.5f, Counted(95f, Others(("Hero", 100f), ("Ragna", 40f))));
+            Assert.Equal(66.25f, Counted(100f, Others(("Twin", 100f), ("Ragna", 40f))));
+            Assert.Equal(66.25f, Counted(100f, Others(("Twin", 95f), ("Ragna", 40f))));
+            Assert.Equal(65f, Counted(95f, Others(("Hero", 100f), ("Ragna", 40f))));
         }
 
         [Fact]
         public void OnlyTheFirstWideGapSplitsAndEveryoneAboveItIsHeldAlike()
         {
-            // 20, 40 | 70, 100: the gaps are 20, 30 and 30, and the first wider than 20 is 40 to 70.
-            var others = Others(("Bjorn", 20f), ("Ragna", 40f), ("Mid", 70f));
-            Assert.Equal(58.75f, Counted(100f, others));
-            Assert.Equal(51.25f, Counted(70f, Others(("Bjorn", 20f), ("Ragna", 40f), ("Hero", 100f))));
+            // 30, 40 | 70, 100: the steps are 10, 30 and 30, and the first wider than 15 is 40 to 70.
+            Assert.Equal(66.25f, Counted(100f, Others(("Bjorn", 30f), ("Ragna", 40f), ("Mid", 70f))));
+            Assert.Equal(58.75f, Counted(70f, Others(("Bjorn", 30f), ("Ragna", 40f), ("Hero", 100f))));
         }
 
         [Fact]
         public void ACharacterWithinTheGapOfTheGroupRaisesTheCeiling()
         {
-            // 40, 60 | 100: 40 to 60 is no wider than 20, so the gap is 60 to 100 and the ceiling 65.
-            Assert.Equal(73.75f, Counted(100f, Others(("Ragna", 40f), ("Mid", 60f))));
+            // 40, 55 | 100: 40 to 55 is no wider than 15, so the gap is 55 to 100 and the ceiling 70.
+            Assert.Equal(77.5f, Counted(100f, Others(("Ragna", 40f), ("Mid", 55f))));
         }
 
         [Fact]
@@ -89,25 +120,25 @@ namespace Kinsmen.Tests
         }
 
         [Fact]
-        public void ASkillNobodyElseTrainedHoldsAtTheMargin()
+        public void ASkillNobodyElseTrainedHoldsAtTheGap()
         {
-            Assert.Equal(28.75f, Counted(100f, Others(("Ragna", 0f), ("Bjorn", 0f))));
+            Assert.Equal(36.25f, Counted(100f, Others(("Ragna", 0f), ("Bjorn", 0f))));
         }
 
         [Fact]
-        public void GapsAreMeasuredInWholeLevels()
+        public void GapsCountTheShareOfALevelADeathLeaves()
         {
-            // A death takes a share of a level: 40.9 is level 40, and 61.2 is 21 whole levels above it.
-            Assert.Equal(60.5f, Counted(60.5f, Others(("Ragna", 40.9f))));
-            Assert.Equal(49.725f, Counted(61.2f, Others(("Ragna", 40.9f))), 3);
+            // 55.5 is 14.6 above 40.9, inside the gap; 56.2 is 15.3 above it, just past.
+            Assert.Equal(55.5f, Counted(55.5f, Others(("Ragna", 40.9f))));
+            Assert.Equal(55.975f, Counted(56.2f, Others(("Ragna", 40.9f))), 3);
         }
 
         [Fact]
         public void TheCeilingNamesTheBestBelowTheGap()
         {
-            var ceiling = Ladder.CeilingFor(Others(("Bjorn", 25f), ("Ragna", 40f)), 100f, Gap, Margin);
+            var ceiling = Ladder.CeilingFor(Others(("Bjorn", 25f), ("Ragna", 40f)), 100f, Gap);
             Assert.NotNull(ceiling);
-            Assert.Equal(45f, ceiling.Limit);
+            Assert.Equal(55f, ceiling.Limit);
             Assert.Equal("Ragna", ceiling.Holder);
             Assert.Equal(40f, ceiling.HolderLevel);
         }
@@ -115,9 +146,9 @@ namespace Kinsmen.Tests
         [Fact]
         public void NoGapMeansNoCeiling()
         {
-            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 40f, Gap, Margin));
-            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 55f, Gap, Margin));
-            Assert.Null(Ladder.CeilingFor(Others(), 70f, Gap, Margin));
+            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 40f, Gap));
+            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 55f, Gap));
+            Assert.Null(Ladder.CeilingFor(Others(), 70f, Gap));
         }
 
         [Fact]
@@ -158,16 +189,16 @@ namespace Kinsmen.Tests
         {
             var all = new List<Standing>
             {
-                new Standing(1, "Bjorn", 20f),
+                new Standing(1, "Bjorn", 30f),
                 new Standing(2, "Ragna", 40f),
                 new Standing(3, "Mid", 70f),
                 new Standing(4, "Hero", 100f),
             };
-            var counted = Ladder.CountAll(all, Gap, Margin, Rate);
-            Assert.Equal(20f, counted[1]);
+            var counted = Ladder.CountAll(all, Gap, Rate);
+            Assert.Equal(30f, counted[1]);
             Assert.Equal(40f, counted[2]);
-            Assert.Equal(51.25f, counted[3]);
-            Assert.Equal(58.75f, counted[4]);
+            Assert.Equal(58.75f, counted[3]);
+            Assert.Equal(66.25f, counted[4]);
         }
     }
 }

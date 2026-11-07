@@ -16,7 +16,7 @@ namespace Kinsmen.SelfTest
     /// real game: the server notes it, writes its file, sends the record to everyone, and this
     /// game counts again. The made-up character first stands at 0, which holds the character's
     /// skills above the gap; then catches up to within the gap, which lifts the hold; then stands
-    /// just past it, which holds again at the made-up level plus the margin. Last it is taken out
+    /// just past it, which holds again at the made-up level plus the gap. Last it is taken out
     /// of the record, which an admin or the host may do.
     /// </summary>
     internal static class ServerTests
@@ -81,7 +81,7 @@ namespace Kinsmen.SelfTest
             report.Check(skills.GetSkillLevel(type) == free, "when the second player rises to " + Report.N(close) + ", within the gap, " + type + " counts in full again",
                 "the game gives " + Report.N(skills.GetSkillLevel(type)) + ", " + Report.N(free) + " in full");
 
-            // One level further apart: held again, at their level plus the margin.
+            // One level further apart: held again, at their level plus the gap.
             var far = close - 1f;
             yield return Send(type, far, report);
             expected = FromRecord(player, type, saved);
@@ -112,7 +112,7 @@ namespace Kinsmen.SelfTest
         {
             var settings = Plugin.Settings;
             var others = RecordClient.ServerRecord.Others((int)skill, player.GetPlayerID());
-            var counted = Ladder.Lower(saved, Ladder.CeilingFor(others, saved, settings.Gap, settings.Margin), settings.Rate);
+            var counted = Ladder.Lower(saved, Ladder.CeilingFor(others, saved, settings.Gap), settings.Rate);
             return Mathf.Floor(counted + Holds.FromEffects(player, skill));
         }
 

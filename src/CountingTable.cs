@@ -38,9 +38,8 @@ namespace Kinsmen
             {
                 if (_fixed.ContainsKey(skill)) continue;
                 _steps[skill] = record.Others(skill, self)
-                    .GroupBy(s => s.Whole)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.OrderByDescending(s => s.Level).ThenBy(s => s.Name, StringComparer.Ordinal).First())
+                    .OrderBy(s => s.Level)
+                    .ThenByDescending(s => s.Name, StringComparer.Ordinal)
                     .ToArray();
             }
         }
@@ -53,7 +52,7 @@ namespace Kinsmen
         {
             if (_fixed.TryGetValue(skill, out var cap)) return Ladder.Lower(level, cap, _settings.Rate);
             var best = BestBelowGap(skill, level);
-            return best == null ? level : Ladder.Lower(level, best.Level + _settings.Margin, _settings.Rate);
+            return best == null ? level : Ladder.Lower(level, best.Level + _settings.Gap, _settings.Rate);
         }
 
         /// <summary>The ceiling a level stands under where it is lowered, none where it counts in full. A cap set by hand names no holder.</summary>
@@ -62,57 +61,56 @@ namespace Kinsmen
             if (_fixed.TryGetValue(skill, out var cap)) return level > cap ? new Ceiling(cap, null, 0f) : null;
             var best = BestBelowGap(skill, level);
             if (best == null) return null;
-            var limit = best.Level + _settings.Margin;
+            var limit = best.Level + _settings.Gap;
             return level > limit ? new Ceiling(limit, best.Name, best.Level) : null;
         }
 
         /// <summary>
         /// A skill's cap as it stands, with the asking character at its own live level among the
-        /// rest: where a character far ahead counts in full up to, and above which whole level that
-        /// starts. None for a skill neither listed nor capped by hand.
+        /// rest: where a character far ahead counts in full up to. None for a skill neither listed
+        /// nor capped by hand.
         /// </summary>
         public Cap Cap(int skill, float level)
         {
-            if (_fixed.TryGetValue(skill, out var cap)) return new Cap(cap, null, 0f, cap, true);
+            if (_fixed.TryGetValue(skill, out var cap)) return new Cap(cap, null, 0f, true);
             if (!_steps.TryGetValue(skill, out var steps)) return null;
             var asking = new Standing(long.MinValue, null, level);
             var best = Ladder.GroupBest(steps.Concat(new[] { asking }), _settings.Gap);
-            return new Cap(best.Level + _settings.Margin, best.Name, best.Level, best.Whole + _settings.Gap, false);
+            return new Cap(best.Level + _settings.Gap, best.Name, best.Level, false);
         }
 
         /// <summary>The skills with a cap: the listed ones and those capped by hand.</summary>
         public IEnumerable<int> Capped => _steps.Keys.Concat(_fixed.Keys).Distinct();
 
         /// <summary>
-        /// Walks up everyone's whole levels with this one among them, and where the first step up
-        /// is wider than the gap and this level is at or above it, the best character below; none
-        /// otherwise. Makes nothing new.
+        /// Walks up everyone's levels with this one among them, and where the first step up is wider
+        /// than the gap and this level is at or above it, the best character below; none otherwise.
+        /// Makes nothing new.
         /// </summary>
         private Standing BestBelowGap(int skill, float level)
         {
             if (!_steps.TryGetValue(skill, out var steps)) return null;
-            var whole = (float)Math.Floor(level);
             var gap = _settings.Gap;
             var placed = false;
             float? previous = null;
             Standing best = null;
             foreach (var step in steps)
             {
-                if (!placed && whole <= step.Whole)
+                if (!placed && level <= step.Level)
                 {
                     placed = true;
-                    if (whole < step.Whole)
+                    if (level < step.Level)
                     {
-                        if (previous != null && whole - previous.Value > gap) return best;
-                        previous = whole;
+                        if (previous != null && level - previous.Value > gap) return best;
+                        previous = level;
                         best = null;
                     }
                 }
-                if (previous != null && step.Whole - previous.Value > gap) return whole >= step.Whole ? best : null;
-                previous = step.Whole;
+                if (previous != null && step.Level - previous.Value > gap) return level >= step.Level ? best : null;
+                previous = step.Level;
                 best = step;
             }
-            if (!placed && previous != null && whole - previous.Value > gap) return best;
+            if (!placed && previous != null && level - previous.Value > gap) return best;
             return null;
         }
     }

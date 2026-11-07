@@ -5,7 +5,7 @@ namespace Kinsmen.Tests
 {
     /// <summary>
     /// The caps as everyone can see them, and caps the server sets by hand. A skill's cap is where a
-    /// character far ahead counts in full up to: the best level of the group plus the margin, the
+    /// character far ahead counts in full up to: the best level of the group plus the gap, the
     /// group being everyone below the first wide gap. A cap set by hand replaces it for that skill.
     /// </summary>
     public class CapsTests
@@ -15,7 +15,7 @@ namespace Kinsmen.Tests
         private static readonly int Fishing = (int)Skills.SkillType.Fishing;
         private const long Self = 99;
 
-        private static readonly LadderSettings Defaults = new LadderSettings(20f, 5f, 0.25f);
+        private static readonly LadderSettings Defaults = new LadderSettings(15f, 0.25f);
 
         private static Record Group()
         {
@@ -30,7 +30,7 @@ namespace Kinsmen.Tests
         public void TheGroupsBestIsTheBestBelowTheFirstWideGap()
         {
             var group = Group().Others(Swords, Self);
-            var best = Ladder.GroupBest(group, 20f);
+            var best = Ladder.GroupBest(group, 15f);
             Assert.Equal("Ragna", best.Name);
             Assert.Equal(40f, best.Level);
         }
@@ -38,9 +38,9 @@ namespace Kinsmen.Tests
         [Fact]
         public void WithoutAWideGapTheGroupsBestIsTheBestOfAll()
         {
-            var best = Ladder.GroupBest(new List<Standing> { new Standing(1, "A", 20f), new Standing(2, "B", 35f) }, 20f);
+            var best = Ladder.GroupBest(new List<Standing> { new Standing(1, "A", 20f), new Standing(2, "B", 35f) }, 15f);
             Assert.Equal("B", best.Name);
-            Assert.Null(Ladder.GroupBest(new List<Standing>(), 20f));
+            Assert.Null(Ladder.GroupBest(new List<Standing>(), 15f));
         }
 
         [Fact]
@@ -48,11 +48,10 @@ namespace Kinsmen.Tests
         {
             var table = new CountingTable(Group(), Self, new HashSet<int> { Swords, Bows }, Defaults);
             var swords = table.Cap(Swords, 30f);
-            Assert.Equal(45f, swords.Limit);
+            Assert.Equal(55f, swords.Limit);
             Assert.Equal("Ragna", swords.Holder);
-            Assert.Equal(60f, swords.HeldAbove);
             // Bows: 10 and 90 are 80 apart, so the group is Bjorn alone.
-            Assert.Equal(15f, table.Cap(Bows, 0f).Limit);
+            Assert.Equal(25f, table.Cap(Bows, 0f).Limit);
         }
 
         [Fact]
@@ -60,7 +59,7 @@ namespace Kinsmen.Tests
         {
             // Asked at 50 Swords, the character stands with Ragna's 40, so the group's best is its own 50.
             var cap = new CountingTable(Group(), Self, new HashSet<int> { Swords }, Defaults).Cap(Swords, 50f);
-            Assert.Equal(55f, cap.Limit);
+            Assert.Equal(65f, cap.Limit);
             Assert.Null(cap.Holder);
         }
 
@@ -111,13 +110,13 @@ namespace Kinsmen.Tests
         [Fact]
         public void TheCapListSaysEachSkillsCapPlainly()
         {
-            Assert.Equal("Swords: above 60 counts in full up to 45 (Ragna's 40 + 5), each level beyond a quarter",
-                Words.CapLine("Swords", new Cap(45f, "Ragna", 40f, 60f, false), 5f, 0.25f));
-            Assert.Equal("Bows: above 25 counts in full up to 10 (yours + 5), each level beyond a quarter",
-                Words.CapLine("Bows", new Cap(10f, null, 5f, 25f, false), 5f, 0.25f));
+            Assert.Equal("Swords: counts in full up to 55 (Ragna's 40 + 15), each level beyond a quarter",
+                Words.CapLine("Swords", new Cap(55f, "Ragna", 40f, false), 15f, 0.25f));
+            Assert.Equal("Bows: counts in full up to 25 (your 10 + 15), each level beyond a quarter",
+                Words.CapLine("Bows", new Cap(25f, null, 10f, false), 15f, 0.25f));
             Assert.Equal("Swords: held by the server at 50, each level beyond a quarter",
-                Words.CapLine("Swords", new Cap(50f, null, 0f, 50f, true), 5f, 0.25f));
-            Assert.Equal("Fishing: nobody has a level yet", Words.CapLine("Fishing", null, 5f, 0.25f));
+                Words.CapLine("Swords", new Cap(50f, null, 0f, true), 15f, 0.25f));
+            Assert.Equal("Fishing: nobody has a level yet", Words.CapLine("Fishing", null, 15f, 0.25f));
         }
 
         [Fact]

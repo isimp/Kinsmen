@@ -14,7 +14,7 @@ namespace Kinsmen.Tests
         private static readonly int Fishing = (int)Skills.SkillType.Fishing;
 
         private static CountingTable Table(Record record) =>
-            new CountingTable(record, Hero, new HashSet<int> { Swords }, new LadderSettings(20f, 5f, 0.25f));
+            new CountingTable(record, Hero, new HashSet<int> { Swords }, new LadderSettings(15f, 0.25f));
 
         private static Record Group(float heroRecorded = 100f)
         {
@@ -34,7 +34,7 @@ namespace Kinsmen.Tests
         [Fact]
         public void AHeldSkillCountsByTheLadder()
         {
-            Assert.Equal(58.75f, Table(Group()).Lower(Swords, 100f));
+            Assert.Equal(66.25f, Table(Group()).Lower(Swords, 100f));
         }
 
         [Fact]
@@ -47,8 +47,8 @@ namespace Kinsmen.Tests
         [Fact]
         public void TheCharactersOwnRecordedLevelIsLeftOutForItsLiveOne()
         {
-            // Recorded at 60, which would stand between Ragna and the live 100 if it counted.
-            Assert.Equal(58.75f, Table(Group(heroRecorded: 60f)).Lower(Swords, 100f));
+            // Recorded at 50, which would stand between Ragna and the live 100 if it counted.
+            Assert.Equal(66.25f, Table(Group(heroRecorded: 50f)).Lower(Swords, 100f));
         }
 
         [Fact]
@@ -56,8 +56,8 @@ namespace Kinsmen.Tests
         {
             var table = Table(Group());
             Assert.Equal(30f, table.Lower(Swords, 30f));
-            Assert.Equal(60f, table.Lower(Swords, 60f));
-            Assert.Equal(49f, table.Lower(Swords, 61f));
+            Assert.Equal(55f, table.Lower(Swords, 55f));
+            Assert.Equal(55.25f, table.Lower(Swords, 56f));
         }
 
         [Fact]
@@ -65,14 +65,14 @@ namespace Kinsmen.Tests
         {
             var why = Table(Group()).Why(Swords, 100f);
             Assert.Equal("Ragna", why.Holder);
-            Assert.Equal(45f, why.Limit);
+            Assert.Equal(55f, why.Limit);
         }
 
         [Fact]
         public void NoReasonIsGivenWhereNothingIsLowered()
         {
             Assert.Null(Table(Group()).Why(Swords, 44f));
-            Assert.Null(Table(Group()).Why(Swords, 60f));
+            Assert.Null(Table(Group()).Why(Swords, 55f));
         }
 
         [Fact]
@@ -82,12 +82,12 @@ namespace Kinsmen.Tests
             record.Note(1, "Bjorn", new Dictionary<int, float> { [Swords] = 20f }, 0);
             record.Note(2, "Ragna", new Dictionary<int, float> { [Swords] = 40f }, 0);
             record.Note(3, "Mid", new Dictionary<int, float> { [Swords] = 70f }, 0);
-            var settings = new LadderSettings(20f, 5f, 0.25f);
+            var settings = new LadderSettings(15f, 0.25f);
             var table = new CountingTable(record, Hero, new HashSet<int> { Swords }, settings);
             for (var tenth = 0; tenth <= 1000; tenth++)
             {
                 var level = tenth / 10f;
-                var expected = Ladder.Lower(level, Ladder.CeilingFor(record.Others(Swords, Hero), level, 20f, 5f), 0.25f);
+                var expected = Ladder.Lower(level, Ladder.CeilingFor(record.Others(Swords, Hero), level, 15f), 0.25f);
                 Assert.Equal(expected, table.Lower(Swords, level));
             }
         }

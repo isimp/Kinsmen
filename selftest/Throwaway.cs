@@ -21,7 +21,7 @@ namespace Kinsmen.SelfTest
     {
         public const string NameStart = "KinsmenTest";
 
-        /// <summary>Raised to here: past the default gap of 20, so the skill is first free, then held.</summary>
+        /// <summary>Raised to here: past the default gap of 15, so the skill is first free, then held.</summary>
         private const float Top = 45f;
 
         /// <summary>The most rises tried, should a gain rate of the world make rising slow.</summary>

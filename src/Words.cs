@@ -43,13 +43,13 @@ namespace Kinsmen
             ": up to " + Count(limit) + " counts in full, each level above that " + Rate(rate) + ".";
 
         /// <summary>One skill's cap as /kinsmen caps lists it.</summary>
-        public static string CapLine(string skill, Cap cap, float margin, float rate)
+        public static string CapLine(string skill, Cap cap, float gap, float rate)
         {
             if (cap == null) return skill + ": nobody has a level yet";
             if (cap.SetByHand) return skill + ": held by the server at " + Whole(cap.Limit) + ", each level beyond " + Rate(rate);
-            var by = cap.Holder == null ? "yours" : cap.Holder + "'s " + Whole(cap.HolderLevel);
-            return skill + ": above " + Whole(cap.HeldAbove) + " counts in full up to " + Whole(cap.Limit) +
-                   " (" + by + " + " + margin.ToString("0.#", CultureInfo.InvariantCulture) + "), each level beyond " + Rate(rate);
+            var by = (cap.Holder == null ? "your " : cap.Holder + "'s ") + Whole(cap.HolderLevel);
+            return skill + ": counts in full up to " + Whole(cap.Limit) +
+                   " (" + by + " + " + gap.ToString("0.#", CultureInfo.InvariantCulture) + "), each level beyond " + Rate(rate);
         }
 
         private static string Whole(float level) => Count((int)Math.Floor(level));

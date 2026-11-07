@@ -8,7 +8,7 @@ Most of Kinsmen was written by Claude Code (Anthropic), which did the heavy lift
 
 ## How it works
 
-For each skill, Kinsmen sorts everyone's levels and looks for the first gap of more than 20 levels. Everyone below that gap counts in full. Everyone above it counts in full up to the best level below the gap plus 5, and each further level counts as a quarter. A skill at 100 against a best of 40 below the gap counts as 58. When nobody stands that far ahead, nothing changes.
+For each skill, Kinsmen sorts everyone's levels and looks for the first gap of more than 15 levels. Everyone below that gap counts in full. Everyone above it counts in full up to the best level below the gap plus 15, and each further level counts as a quarter, so one more level of training never makes a skill count for less. A skill at 100 against a best of 40 below the gap counts as 66. When nobody stands that far ahead, nothing changes.
 
 The lowered level applies only on that server and only to what the skill does in the moment. Gear, meads and other effects add their levels on top of it. The saved level, how skills rise and what a death takes stay as the game has them, and leaving the server restores every skill in full.
 
@@ -26,7 +26,7 @@ Kinsmen has to be installed on the server and by every player, and the server re
 
 ## Settings
 
-All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the margin, the share each further level counts, the held skills, limits set by hand for single skills, and how long the record keeps a character.
+All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the share each further level counts, the held skills, limits set by hand for single skills, and how long the record keeps a character.
 
 ## More
 

@@ -49,7 +49,6 @@ namespace Kinsmen
         private static ConfigEntry<bool> _enabled;
         private static ConfigEntry<string> _skills;
         private static ConfigEntry<float> _gap;
-        private static ConfigEntry<float> _margin;
         private static ConfigEntry<float> _rate;
         private static ConfigEntry<int> _forgetAfterDays;
         private static ConfigEntry<string> _fixedCaps;
@@ -66,7 +65,7 @@ namespace Kinsmen
         internal static bool ShowJoinMessage => _showJoinMessage == null || _showJoinMessage.Value;
 
         internal static LadderSettings Settings =>
-            new LadderSettings(_gap?.Value ?? 20f, _margin?.Value ?? 5f, _rate?.Value ?? 0.25f);
+            new LadderSettings(_gap?.Value ?? 15f, _rate?.Value ?? 0.25f);
 
         /// <summary>A setting that is a rule of the server: ServerSync hands the server's value to every game, and a game cannot change it while the lock holds.</summary>
         private ConfigEntry<T> Rule<T>(string group, string name, T value, ConfigDescription description)
@@ -103,17 +102,15 @@ namespace Kinsmen
                 "Unarmed and Ride (not the window's Fists and Riding); case and spaces do not matter. A number stands for a skill another " +
                 "mod adds, by its id. A name Kinsmen does not know is named in the log and left free."));
 
-            _gap = Rule("Rule", "OutlierGap", 20f, new ConfigDescription(
-                "Walking up everyone's levels in a skill, the first step up wider than this splits off the characters far ahead. " +
-                "Everyone below it counts in full.",
+            _gap = Rule("Rule", "OutlierGap", 15f, new ConfigDescription(
+                "Walking up everyone's levels in a skill, the first step up wider than this splits off the characters far ahead; " +
+                "everyone below it counts in full. A character far ahead counts in full up to the best level below the step plus " +
+                "this many levels, and RateAbove for each level beyond, so one more level of training never lowers what a skill counts as. " +
+                "Smaller holds characters far ahead tighter, but also catches a normal step between two players sooner.",
                 new AcceptableValueRange<float>(1f, 100f)));
 
-            _margin = Rule("Rule", "Margin", 5f, new ConfigDescription(
-                "A character above the gap counts in full up to the best level below the gap plus this many levels.",
-                new AcceptableValueRange<float>(0f, 100f)));
-
             _rate = Rule("Rule", "RateAbove", 0.25f, new ConfigDescription(
-                "What each level above that counts as: 0.25 is a quarter of a level, 0 holds the character at the margin, 1 holds nobody.",
+                "What each level beyond that counts as: 0.25 is a quarter of a level, 0 holds the character there, 1 holds nobody.",
                 new AcceptableValueRange<float>(0f, 1f)));
 
             _fixedCaps = Rule("Rule", "FixedCaps", "", new ConfigDescription(

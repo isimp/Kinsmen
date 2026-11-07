@@ -109,7 +109,7 @@ namespace Kinsmen
             var lines = _table.Capped
                 .Select(id => (Name: Name((Skills.SkillType)id), Id: id))
                 .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
-                .Select(s => Words.CapLine(s.Name, _table.Cap(s.Id, levels.TryGetValue(s.Id, out var level) ? level : 0f), settings.Margin, settings.Rate));
+                .Select(s => Words.CapLine(s.Name, _table.Cap(s.Id, levels.TryGetValue(s.Id, out var level) ? level : 0f), settings.Gap, settings.Rate));
             return "Kinsmen caps on this server:\n" + string.Join("\n", lines);
         }
 
