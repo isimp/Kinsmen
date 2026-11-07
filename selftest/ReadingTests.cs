@@ -261,7 +261,7 @@ namespace Kinsmen.SelfTest
             var missing = held.Select(s => RecordClient.Name(s.m_info.m_skill)).Where(name => caps.IndexOf(name + ": above ", StringComparison.Ordinal) < 0).ToList();
             report.Check(missing.Count == 0, "/kinsmen caps lists every held skill's cap", "missing " + string.Join(", ", missing));
             var unsaid = RecordClient.Held(Player.m_localPlayer).Select(h => RecordClient.Name(h.Skill)).Where(name => described.IndexOf(name + " counts as ", StringComparison.Ordinal) < 0).ToList();
-            report.Check(unsaid.Count == 0, "/kinsmen says why each held skill counts lower", "missing " + string.Join(", ", unsaid));
+            report.Check(unsaid.Count == 0, "/kinsmen held says why each held skill counts lower", "missing " + string.Join(", ", unsaid));
         }
 
         /// <summary>The game's own Skill.Raise, on skill objects of the test's own: the same rises end the same with the hold in force and without.</summary>

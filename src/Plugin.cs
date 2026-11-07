@@ -167,10 +167,11 @@ namespace Kinsmen
             new Dictionary<string, Action<Terminal.ConsoleEventArgs>>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// /kinsmen lists which of your skills count lower here and why; /kinsmen caps lists every
-        /// capped skill's cap as it stands; /kinsmen forget Name takes a character out of the
-        /// server's record (admins); /kinsmen record lists the record.
-        /// Registered with isCheat false, which makes it reachable from chat too.
+        /// Plain /kinsmen, or a word it does not know, lists the words that can follow it (Words.Help):
+        /// /kinsmen held lists which of your skills count lower here and why; /kinsmen caps lists
+        /// every capped skill's cap as it stands; /kinsmen forget Name takes a character out of the
+        /// server's record (admins); /kinsmen record lists the record; /kinsmen selftest where the
+        /// self-test is installed. Registered with isCheat false, which makes it reachable from chat too.
         /// </summary>
         private static void RegisterCommand()
         {
@@ -186,15 +187,17 @@ namespace Kinsmen
             };
             CommandWords["record"] = args => args.Context.OrNull()?.AddString(RecordClient.DescribeRecord());
             CommandWords["caps"] = args => args.Context.OrNull()?.AddString(RecordClient.DescribeCaps());
+            CommandWords["held"] = args => args.Context.OrNull()?.AddString(RecordClient.DescribeHeld());
 
-            _ = new Terminal.ConsoleCommand("kinsmen", "Which of your skills count lower on this server, and why.", args =>
+            _ = new Terminal.ConsoleCommand("kinsmen", "Kinsmen: type /kinsmen for its commands.", args =>
             {
                 if (args.Length >= 2 && CommandWords.TryGetValue(args[1], out var word))
                 {
                     word(args);
                     return;
                 }
-                args.Context.OrNull()?.AddString(RecordClient.DescribeHeld());
+                var unknown = args.Length >= 2 ? args[1] : null;
+                args.Context.OrNull()?.AddString(Words.Help(CommandWords.ContainsKey("selftest"), unknown));
             });
         }
     }

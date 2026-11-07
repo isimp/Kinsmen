@@ -165,7 +165,7 @@ jobs:
 
             Requires BepInEx 5. Install it on the server and on every client: a server running Kinsmen refuses players without it, because the lowering runs in each player's own game.
 
-            Type /kinsmen in chat for your held skills, /kinsmen caps for every cap on the server.
+            Type /kinsmen in chat for its commands: /kinsmen held for your held skills, /kinsmen caps for every cap on the server.
           files: |
             dist/hexium/Kinsmen-${{ inputs.version }}.zip
             dist/Kinsmen.dll

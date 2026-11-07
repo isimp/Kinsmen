@@ -143,7 +143,7 @@ namespace Kinsmen
             ZRoutedRpc.instance.InvokeRoutedRPC(RecordMessages.Forget, name);
         }
 
-        /// <summary>The character's held skills, each with what it counts as and why; what /kinsmen says.</summary>
+        /// <summary>The character's held skills, each with what it counts as and why; what /kinsmen held says.</summary>
         public static string DescribeHeld()
         {
             if (_record == null) return "Kinsmen: no record from the server yet, so every skill counts in full.";

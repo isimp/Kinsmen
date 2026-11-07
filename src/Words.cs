@@ -42,6 +42,20 @@ namespace Kinsmen
                 : "The best " + skill + " of the group is " + Count(holderLevel) + ", by " + holder) +
             ": up to " + Count(limit) + " counts in full, each level above that " + Rate(rate) + ".";
 
+        /// <summary>What plain /kinsmen says: every word that can follow it, the self-test's where it is installed; a word it does not know is named first.</summary>
+        public static string Help(bool selfTest, string unknown)
+        {
+            var text = new StringBuilder();
+            if (!string.IsNullOrEmpty(unknown)) text.Append("Kinsmen does not know \"").Append(unknown).Append("\".\n");
+            text.Append("Kinsmen commands:\n")
+                .Append("/kinsmen held: which of your skills count lower here, and why\n")
+                .Append("/kinsmen caps: every held skill's limit on this server\n")
+                .Append("/kinsmen record: the characters the server remembers\n")
+                .Append("/kinsmen forget Name: take a character out of the record (admins)");
+            if (selfTest) text.Append("\n/kinsmen selftest: the self-test; add progression (a KinsmenTest character only) or watch");
+            return text.ToString();
+        }
+
         /// <summary>One skill's cap as /kinsmen caps lists it.</summary>
         public static string CapLine(string skill, Cap cap, float gap, float rate)
         {

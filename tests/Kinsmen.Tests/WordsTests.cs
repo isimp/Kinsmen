@@ -37,6 +37,33 @@ namespace Kinsmen.Tests
         }
 
         [Fact]
+        public void PlainKinsmenListsWhatCanFollowIt()
+        {
+            Assert.Equal(
+                "Kinsmen commands:\n" +
+                "/kinsmen held: which of your skills count lower here, and why\n" +
+                "/kinsmen caps: every held skill's limit on this server\n" +
+                "/kinsmen record: the characters the server remembers\n" +
+                "/kinsmen forget Name: take a character out of the record (admins)",
+                Words.Help(selfTest: false, unknown: null));
+        }
+
+        [Fact]
+        public void TheHelpNamesTheSelfTestOnlyWhereItIsInstalled()
+        {
+            Assert.EndsWith(
+                "\n/kinsmen selftest: the self-test; add progression (a KinsmenTest character only) or watch",
+                Words.Help(selfTest: true, unknown: null));
+            Assert.DoesNotContain("selftest", Words.Help(selfTest: false, unknown: null));
+        }
+
+        [Fact]
+        public void AnUnknownWordIsNamedBeforeTheHelp()
+        {
+            Assert.StartsWith("Kinsmen does not know \"cap\".\nKinsmen commands:\n", Words.Help(selfTest: false, unknown: "cap"));
+        }
+
+        [Fact]
         public void TheRateIsSaidInWordsWhereItHasThem()
         {
             Assert.Equal("a quarter", Words.Rate(0.25f));

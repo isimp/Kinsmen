@@ -18,7 +18,7 @@ By default Kinsmen holds every weapon skill, both magic skills, Blocking, Run, J
 
 A player whose skills are held gets a message on joining, a list in chat, and an effect icon with the number of held skills. The skills window shows the lowered level beside the real one, and the tooltip says what the skill counts as and whose level sets the limit.
 
-Type /kinsmen in chat to see your held skills and why, /kinsmen caps to see every skill's current limit, and /kinsmen record to see which characters the server remembers.
+Type /kinsmen in chat for its commands: /kinsmen held shows your held skills and why, /kinsmen caps every skill's current limit, and /kinsmen record which characters the server remembers.
 
 ## Multiplayer
 

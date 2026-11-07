@@ -42,21 +42,13 @@ The two stores have different category lists. Hexium takes category names, Thund
 
 ## Install location and compatibility
 
-Kinsmen is needed on the server and on every client. It sets `ModRequired`, so a server running it refuses players without it, because the automation mods run on each client. This is worth stating on the mod pages.
+Kinsmen is needed on the server and on every client. It sets `ModRequired`, so a server running it refuses players without it, because the lowering runs in each player's own game. This is worth stating on the mod pages.
 
-`MinimumVersion` in `src/Plugin.cs` is the oldest version a peer may run. Kinsmen has no RPCs, and the only thing clients must agree on is the ZDO key, so it only needs raising if that key changes.
+`MinimumVersion` in `src/Plugin.cs` is the oldest version a peer may run. Clients and server must agree on the record's messages (`src/RecordMessages.cs`), the record's text (`src/Record.cs`) and the rule (`src/Ladder.cs`), so it needs raising when one of those changes in a way an older Kinsmen would read differently.
 
-## Checking discovery before a release
+## Checking before a release
 
-Kinsmen patches methods in other mods, found at runtime. A target that fails to patch is logged and skipped, and that mod keeps its normal behaviour. Before a release, launch the game once and check the log, which lists every registration point found and every patch installed:
-
-```
-[Info   :     Kinsmen] Scanned N assemblies in Nms, found N container registration point(s).
-[Info   :     Kinsmen]   AzuAutoStore::AzuAutoStore.Util.Boxes::AddContainer  (evict: RemoveContainer)
-[Info   :     Kinsmen] Sealing honoured by AzuAutoStore::AzuAutoStore.Util.Boxes::AddContainer
-```
-
-`/kinsmen` in chat prints the same list with each target's state.
+Kinsmen patches four of the game's methods, named in `tests/Kinsmen.Standards/SkillSafetyStandardTests.cs`. Before a release, launch the game once and check the log for `Kinsmen 0.x.y loaded.` and no line saying Kinsmen could not hook into the game, then run `/kinsmen selftest` in a world and look at `BepInEx/Kinsmen-icon.png`.
 
 ## How the publish works
 
