@@ -60,18 +60,19 @@ namespace Kinsmen
             if (_exempt) return level;
             if (_fixed.TryGetValue(skill, out var cap)) return Ladder.Lower(level, cap, _settings.Rate);
             var best = BestBelowGap(skill, level);
-            return best == null ? level : Ladder.Lower(level, best.Level + _settings.Gap, _settings.Rate);
+            return best == null ? level : Ladder.Lower(level, Ladder.Limit(best.Level, _settings.Gap, _settings.Minimum), _settings.Rate);
         }
 
-        /// <summary>The ceiling a level stands under where it is lowered, none where it counts in full. A cap set by hand names no holder.</summary>
+        /// <summary>The ceiling a level stands under where it is lowered, none where it counts in full. A cap set by hand, or by the minimum, names no holder.</summary>
         public Ceiling Why(int skill, float level)
         {
             if (_exempt) return null;
             if (_fixed.TryGetValue(skill, out var cap)) return level > cap ? new Ceiling(cap, null, 0f) : null;
             var best = BestBelowGap(skill, level);
             if (best == null) return null;
-            var limit = best.Level + _settings.Gap;
-            return level > limit ? new Ceiling(limit, best.Name, best.Level) : null;
+            var limit = Ladder.Limit(best.Level, _settings.Gap, _settings.Minimum);
+            if (level <= limit) return null;
+            return Ladder.ByMinimum(best.Level, _settings.Gap, _settings.Minimum) ? new Ceiling(limit, null, 0f) : new Ceiling(limit, best.Name, best.Level);
         }
 
         /// <summary>
@@ -85,7 +86,8 @@ namespace Kinsmen
             if (!_steps.TryGetValue(skill, out var steps)) return null;
             var asking = new Standing(long.MinValue, null, level);
             var best = Ladder.GroupBest(steps.Concat(new[] { asking }), _settings.Gap);
-            return new Cap(best.Level + _settings.Gap, best.Name, best.Level, false);
+            var limit = Ladder.Limit(best.Level, _settings.Gap, _settings.Minimum);
+            return new Cap(limit, best.Name, best.Level, false, Ladder.ByMinimum(best.Level, _settings.Gap, _settings.Minimum));
         }
 
         /// <summary>The skills with a cap: the listed ones and those capped by hand.</summary>

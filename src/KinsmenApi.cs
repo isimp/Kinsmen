@@ -31,7 +31,7 @@ namespace Kinsmen
         /// <summary>
         /// What a saved level of one of the local character's skills counts as here, before effects
         /// add, and whose level holds it there: the best of the group below the gap and that
-        /// character's level, or no name and the cap itself where the server set the cap by hand.
+        /// character's level, or no name and the cap itself where the server set the cap by hand or its minimum sets it.
         /// False, with the level unchanged and no holder, when the skill counts in full. Builds no
         /// text, so a mod can ask it for every skill each time it reads them.
         /// </summary>

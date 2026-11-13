@@ -54,13 +54,15 @@ namespace Kinsmen.SelfTest
             if (others.Count > 0) report.Note("the record also holds " + string.Join(", ", others) + "; the levels below count them too, and the holds are clearest on a world with nobody else");
 
             var gap = Plugin.Settings.Gap;
+            // A second player at 0 holds a skill only past the higher of the gap and the minimum.
+            var needed = Math.Max(gap, Plugin.Settings.Minimum) + 6f;
             var handSet = SkillList.ParseCaps(Plugin.FixedCaps, new List<string>());
             var target = skills.GetSkillList()
-                .Where(s => listed.Contains((int)s.m_info.m_skill) && !handSet.ContainsKey((int)s.m_info.m_skill) && s.m_level >= gap + 6f)
+                .Where(s => listed.Contains((int)s.m_info.m_skill) && !handSet.ContainsKey((int)s.m_info.m_skill) && s.m_level >= needed)
                 .OrderByDescending(s => s.m_level).FirstOrDefault();
             if (target == null)
             {
-                report.Skip("no listed skill of this character is at " + Report.N(gap + 6f) + " or more, which a second player's changes need");
+                report.Skip("no listed skill of this character is at " + Report.N(needed) + " or more, which a second player's changes need");
                 yield break;
             }
             var type = target.m_info.m_skill;
@@ -118,7 +120,7 @@ namespace Kinsmen.SelfTest
         {
             var settings = Plugin.Settings;
             var others = RecordClient.ServerRecord.Others((int)skill, player.GetPlayerID());
-            var counted = Ladder.Lower(saved, Ladder.CeilingFor(others, saved, settings.Gap), settings.Rate);
+            var counted = Ladder.Lower(saved, Ladder.CeilingFor(others, saved, settings.Gap, settings.Minimum), settings.Rate);
             return Mathf.Floor(counted + Holds.FromEffects(player, skill));
         }
 

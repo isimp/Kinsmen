@@ -29,7 +29,7 @@ namespace Kinsmen
     {
         public const string Guid = "isimp.Kinsmen";
         public const string Name = "Kinsmen";
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.0";
 
         /// <summary>
         /// The oldest Kinsmen a peer may run and still be let in. Raise it only when a release
@@ -37,7 +37,7 @@ namespace Kinsmen
         /// merely because the version moved: ServerSync demands each side be at least the other's
         /// minimum.
         /// </summary>
-        private const string MinimumVersion = "0.1.0";
+        private const string MinimumVersion = "0.2.0";
 
         internal static ManualLogSource Log;
 
@@ -50,6 +50,7 @@ namespace Kinsmen
         private static ConfigEntry<string> _skills;
         private static ConfigEntry<float> _gap;
         private static ConfigEntry<float> _rate;
+        private static ConfigEntry<float> _minimumCap;
         private static ConfigEntry<int> _forgetAfterDays;
         private static ConfigEntry<string> _fixedCaps;
         private static ConfigEntry<string> _exempt;
@@ -67,7 +68,7 @@ namespace Kinsmen
         internal static bool ShowJoinMessage => _showJoinMessage == null || _showJoinMessage.Value;
 
         internal static LadderSettings Settings =>
-            new LadderSettings(_gap?.Value ?? 15f, _rate?.Value ?? 0.25f);
+            new LadderSettings(_gap?.Value ?? 15f, _rate?.Value ?? 0.25f, _minimumCap?.Value ?? 30f);
 
         /// <summary>A setting that is a rule of the server: ServerSync hands the server's value to every game, and a game cannot change it while the lock holds.</summary>
         private ConfigEntry<T> Rule<T>(string group, string name, T value, ConfigDescription description)
@@ -114,6 +115,12 @@ namespace Kinsmen
             _rate = Rule("Rule", "RateAbove", 0.25f, new ConfigDescription(
                 "What each level beyond that counts as: 0.25 is a quarter of a level, 0 holds the character there, 1 holds nobody.",
                 new AcceptableValueRange<float>(0f, 1f)));
+
+            _minimumCap = Rule("Rule", "MinimumCap", 30f, new ConfigDescription(
+                "However low the rest of the group stands, a character far ahead always counts in full up to at least this level, " +
+                "and RateAbove for each level beyond: with everyone else at 1 Riding, a 35 counts as 31 rather than 20. It only raises " +
+                "the group's cap where that is lower; caps in FixedCaps stay as set. 0 turns it off.",
+                new AcceptableValueRange<float>(0f, 100f)));
 
             _fixedCaps = Rule("Rule", "FixedCaps", "", new ConfigDescription(
                 "Caps set by hand, replacing the group's cap for their skill, as Skill=level separated by commas, such as " +

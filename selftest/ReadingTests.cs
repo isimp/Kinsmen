@@ -43,7 +43,7 @@ namespace Kinsmen.SelfTest
                 var held = trained.Where(s => RecordClient.Table.Why((int)s.m_info.m_skill, s.m_level) != null).ToList();
                 if (held.Count == 0)
                 {
-                    report.Skip("no listed skill of this character is more than " + Report.N(Plugin.Settings.Gap) + " levels above 0, so none can be held; train one past it or use a character that has");
+                    report.Skip("no listed skill of this character is above " + Report.N(Math.Max(Plugin.Settings.Gap, Plugin.Settings.Minimum)) + ", the higher of the gap above 0 and the minimum, so none can be held; train one past it or use a character that has");
                 }
 
                 foreach (var skill in trained)
@@ -80,7 +80,7 @@ namespace Kinsmen.SelfTest
             var counted = RecordClient.Table.Lower((int)type, saved);
             if (!held)
             {
-                report.Check(level == full, type + (listed ? " within the gap" : " off the list") + " counts in full", "gave " + Report.N(level) + ", " + Report.N(full) + " before");
+                report.Check(level == full, type + (listed ? " within its limit" : " off the list") + " counts in full", "gave " + Report.N(level) + ", " + Report.N(full) + " before");
                 return;
             }
 

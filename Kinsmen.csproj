@@ -5,7 +5,7 @@
     <AssemblyName>Kinsmen</AssemblyName>
     <RootNamespace>Kinsmen</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>isimp</Authors>
     <Product>Kinsmen</Product>
     <Description>Holds a character far ahead of the group in fight skills near the rest, without touching saved levels.</Description>

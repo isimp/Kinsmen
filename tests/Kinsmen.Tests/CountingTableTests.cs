@@ -87,7 +87,7 @@ namespace Kinsmen.Tests
             for (var tenth = 0; tenth <= 1000; tenth++)
             {
                 var level = tenth / 10f;
-                var expected = Ladder.Lower(level, Ladder.CeilingFor(record.Others(Swords, Hero), level, 15f), 0.25f);
+                var expected = Ladder.Lower(level, Ladder.CeilingFor(record.Others(Swords, Hero), level, 15f, 0f), 0.25f);
                 Assert.Equal(expected, table.Lower(Swords, level));
             }
         }

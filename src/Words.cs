@@ -64,6 +64,7 @@ namespace Kinsmen
         {
             if (cap == null) return skill + ": nobody has a level yet";
             if (cap.SetByHand) return skill + ": held by the server at " + Whole(cap.Limit) + ", each level beyond " + Rate(rate);
+            if (cap.ByMinimum) return skill + ": counts in full up to " + Whole(cap.Limit) + " (the server's minimum), each level beyond " + Rate(rate);
             var by = (cap.Holder == null ? "your " : cap.Holder + "'s ") + Whole(cap.HolderLevel);
             return skill + ": counts in full up to " + Whole(cap.Limit) +
                    " (" + by + " + " + gap.ToString("0.#", CultureInfo.InvariantCulture) + "), each level beyond " + Rate(rate);

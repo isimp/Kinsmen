@@ -8,7 +8,7 @@ Most of Kinsmen was written by Claude Code (Anthropic), which did the heavy lift
 
 ## How it works
 
-For each skill, Kinsmen sorts everyone's levels and looks for the first gap of more than 15 levels. Everyone below that gap counts in full. Everyone above it counts in full up to the best level below the gap plus 15, and each further level counts as a quarter, so one more level of training never makes a skill count for less. A skill at 100 against a best of 40 below the gap counts as 66. When nobody stands that far ahead, nothing changes.
+For each skill, Kinsmen sorts everyone's levels and looks for the first gap of more than 15 levels. Everyone below that gap counts in full. Everyone above it counts in full up to the best level below the gap plus 15, and each further level counts as a quarter, so one more level of training never makes a skill count for less. However low the rest stand, a skill always counts in full up to 30 and a quarter beyond, so a 35 next to a 1 counts as 31. A skill at 100 against a best of 40 below the gap counts as 66. When nobody stands that far ahead, nothing changes.
 
 The lowered level applies only on that server and only to what the skill does in the moment. Gear, meads and other effects add their levels on top of it. The saved level, how skills rise and what a death takes stay as the game has them, and leaving the server restores every skill in full.
 
@@ -26,7 +26,7 @@ Kinsmen has to be installed on the server and by every player, and the server re
 
 ## Settings
 
-All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the share each further level counts, the held skills, limits set by hand for single skills, characters exempt from any limit, and how long the record keeps a character. An exempt character always counts in full, while its real levels still go into the record and still count for everyone else.
+All settings are in BepInEx/config/isimp.Kinsmen.cfg, each with a description: the gap, the share each further level counts, the level that always counts in full, the held skills, limits set by hand for single skills, characters exempt from any limit, and how long the record keeps a character. An exempt character always counts in full, while its real levels still go into the record and still count for everyone else.
 
 ## More
 

@@ -22,7 +22,7 @@ namespace Kinsmen.Tests
         }
 
         private static float Counted(float level, List<Standing> others) =>
-            Ladder.Lower(level, Ladder.CeilingFor(others, level, Gap), Rate);
+            Ladder.Lower(level, Ladder.CeilingFor(others, level, Gap, 0f), Rate);
 
         [Fact]
         public void AFriendFarAheadCountsFifteenAboveTheBestOfTheRestAndAQuarterBeyond()
@@ -136,7 +136,7 @@ namespace Kinsmen.Tests
         [Fact]
         public void TheCeilingNamesTheBestBelowTheGap()
         {
-            var ceiling = Ladder.CeilingFor(Others(("Bjorn", 25f), ("Ragna", 40f)), 100f, Gap);
+            var ceiling = Ladder.CeilingFor(Others(("Bjorn", 25f), ("Ragna", 40f)), 100f, Gap, 0f);
             Assert.NotNull(ceiling);
             Assert.Equal(55f, ceiling.Limit);
             Assert.Equal("Ragna", ceiling.Holder);
@@ -146,9 +146,9 @@ namespace Kinsmen.Tests
         [Fact]
         public void NoGapMeansNoCeiling()
         {
-            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 40f, Gap));
-            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 55f, Gap));
-            Assert.Null(Ladder.CeilingFor(Others(), 70f, Gap));
+            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 40f, Gap, 0f));
+            Assert.Null(Ladder.CeilingFor(Others(("Ragna", 40f)), 55f, Gap, 0f));
+            Assert.Null(Ladder.CeilingFor(Others(), 70f, Gap, 0f));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Kinsmen.Tests
                 new Standing(3, "Mid", 70f),
                 new Standing(4, "Hero", 100f),
             };
-            var counted = Ladder.CountAll(all, Gap, Rate);
+            var counted = Ladder.CountAll(all, Gap, Rate, 0f);
             Assert.Equal(30f, counted[1]);
             Assert.Equal(40f, counted[2]);
             Assert.Equal(58.75f, counted[3]);
